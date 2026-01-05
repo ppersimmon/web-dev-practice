@@ -40,3 +40,8 @@ You have an object. Your task is to traverse the object recursively, find all th
 **Task 4** 
 Create a base Person object with name and phone properties and an introduce method. Then, create Student and Teacher objects that inherit properties and methods from Person. For the Student, add a course property and a study method; for the Teacher, add a subject property and a teach method. Implement this inheritance so that instances of Student and Teacher can access the introduce method from Person as well as their own specific methods, providing the solution in both ES5 (function constructors/prototypes) and ES6 (classes) formats.
 </details>
+
+## Practice Overview
+<details>
+<summary><strong>Practice 1: Counter</strong></summary> 
+Create a counter that changes color when the number is either negative or positive.
