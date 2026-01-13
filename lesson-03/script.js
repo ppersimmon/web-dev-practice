@@ -63,7 +63,7 @@ bike.stop();
 
 // Task 2
 
-const mainDiv = document.getElementById('app');
+const mainDiv = document.getElementById('characters');
 const prevButton = document.getElementById('prev');
 const nextButton = document.getElementById('next');
 const pageDisplay = document.getElementById('value');
@@ -98,7 +98,13 @@ function loadCharacters(page) {
 
 function renderList (characters) {
     mainDiv.innerHTML = characters.map(item =>
-        `<div><p>${item.name}</p><p>${item.status}</p><img src='${item.image}'</div>`).join('');
+        `<div class="single-character">
+            <img src="${item.image}" alt="${item.name}">
+            
+            <div class="info">
+                <p>Name: <strong>${item.name}</strong></p>
+                <p>Status: ${item.status}</p>
+            </div> </div>`).join('');
 }
 
 function updatePagination (info) {
