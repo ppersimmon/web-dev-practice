@@ -85,3 +85,12 @@ body{
     color: #213C51;
     font-size: 2.1rem;
 }
+
+.loading {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #213C51;
+    text-align: center;
+    margin-top: 50px;
+    width: 100%;
+}

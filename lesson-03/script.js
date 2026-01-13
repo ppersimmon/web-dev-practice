@@ -72,6 +72,7 @@ let currentPage = 1;
 
 function loadCharacters(page) {
     const url = `https://rickandmortyapi.com/api/character/?page=${page}`;
+    mainDiv.innerHTML = '<p class="loading">Loading...</p>';
 
     const response = fetch(url);
     const parsedData = response.then(data => {
