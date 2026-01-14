@@ -70,31 +70,26 @@ const pageDisplay = document.getElementById('value');
 
 let currentPage = 1;
 
-function loadCharacters(page) {
+async function loadCharacters(page) {
     const url = `https://rickandmortyapi.com/api/character/?page=${page}`;
     mainDiv.innerHTML = '<p class="loading">Loading...</p>';
 
-    const response = fetch(url);
-    const parsedData = response.then(data => {
-        if (data.status !== 200){
-            alert('error')
+    try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error('Something went wrong');
         }
-        console.log(data);
-        return data.json();
-    })
-    .catch(error => {
-        console.log('Error', error);
-    })
-    .finally(() => {
-        console.log('Finally');
-    })
-    parsedData.then(data => {
-        renderList(data.results);
-        updatePagination(data.info);
-    })
-    .catch(error => {
-        console.error('Loading Error', error);
-    });
+
+        const data = await response.json();
+        const { info, results } = data;
+
+        renderList(results);
+        updatePagination(info);
+
+    } catch (error) {
+        console.error('Error:', error);
+    }
 }
 
 function renderList (characters) {
@@ -119,25 +114,8 @@ function updatePagination (info) {
 
     pageDisplay.innerHTML = currentPage;
 
-    if (currentPage === 1) {
-        disableButton(prevButton);
-    } else {
-        enableButton(prevButton);
-    }
-
-    if (currentPage === info.pages) {
-        disableButton(nextButton);
-    } else {
-        enableButton(nextButton);
-    }
-}
-
-function disableButton (button) {
-    button.disabled = true;
-}
-
-function enableButton (button) {
-    button.disabled = false;
+    prevButton.disabled = (currentPage === 1);
+    nextButton.disabled = (currentPage === info.pages);
 }
 
 nextButton.addEventListener('click', () => {
