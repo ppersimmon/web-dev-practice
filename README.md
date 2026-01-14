@@ -54,6 +54,13 @@ Write an application that implements displaying a list of characters from the Ri
 The current page number is displayed in the middle. It is calculated from the value of the data.info.next field. If this field is undefined, display data.info.pages (this is the last page). While loading, display the first page. While waiting for the loading, write "Loading..." on the screen.
 </details>
 
+<details>
+<summary><strong>Lesson 4: REST</strong></summary> 
+
+**Task 1**  
+Take the previous homework as a basis. When you click on the card, a modal window opens, displaying the character's picture, name, and status. There is a "Close" button in the modal window, it closes this window. Clicking outside the window also closes the window. To handle events, use event delegation. We change the pagination to lazy loading according to the Instagram type. When scrolling down the list, load another portion of cards.
+</details>
+
 ## Practice Overview
 <details>
 <summary><strong>Practice 1: Counter</strong></summary> 
