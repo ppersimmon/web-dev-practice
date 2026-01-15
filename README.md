@@ -55,7 +55,7 @@ The current page number is displayed in the middle. It is calculated from the va
 </details>
 
 <details>
-<summary><strong>Lesson 4: REST</strong></summary> 
+<summary><strong>Lesson 4: DOM</strong></summary> 
 
 **Task 1**  
 Take the previous homework as a basis. When you click on the card, a modal window opens, displaying the character's picture, name, and status. There is a "Close" button in the modal window, it closes this window. Clicking outside the window also closes the window. To handle events, use event delegation. We change the pagination to lazy loading according to the Instagram type. When scrolling down the list, load another portion of cards.
