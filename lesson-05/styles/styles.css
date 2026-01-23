@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap');
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: #F0FFDF; 
+    font-family: 'Inter', sans-serif; 
+    color: #061E29;
+}
+
+#root {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 20px;
+}
+
+.app-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.wrapper {
+    text-align: center;
+    max-width: 900px;
+    width: 100%;
+}
+
+.header {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin: 0 0 20px 0;
+    letter-spacing: -2px;
+}
+
+.children-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.counter {
+    background-color: #FFFFFF;
+    border: 2px solid #061E29;
+    border-radius: 16px;
+    padding: 30px;    
+    flex: 1;
+    min-width: 280px;
+    max-width: 400px;
+    
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.counter h3 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    opacity: 0.6;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.counter p {
+    font-size: 1rem;
+    margin: 0;
+    font-weight: 500;
+}
+
+.counter strong {
+    display: block;
+    font-size: 5rem;
+    font-weight: 700;
+    margin: 10px 0 30px 0;
+    line-height: 1;
+    letter-spacing: -3px;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+button {
+    flex: 1;
+    background-color: transparent;
+    border: 2px solid #061E29;
+    color: #061E29;
+    padding: 12px 0;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    background-color: #061E29;
+    color: #F0FFDF;
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: scale(0.96);
+}
