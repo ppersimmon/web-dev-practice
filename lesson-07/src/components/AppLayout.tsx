@@ -1,17 +1,10 @@
-import React from 'react';
+import React from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Switch, FormControlLabel } from '@mui/material';
-import PeopleIcon from '@mui/icons-material/People';
-import HomeIcon from '@mui/icons-material/Home';
-import InfoIcon from '@mui/icons-material/Info';
-import { useTheme as useTheme } from '../providers/ThemeProvider.jsx';
+import { useTheme } from '../providers/themeProvider/useTheme';
+import { menuItems } from './MenuItems';
 
 const drawerWidth = 240;
-const menuItems = [
-    { text: 'Home', path: '/', icon: <HomeIcon /> },
-    { text: 'Heroes', path: '/heroes', icon: <PeopleIcon /> },
-    { text: 'About', path: '/about', icon: <InfoIcon /> },
-]
 
 const AppLayout = () => {
   const location = useLocation();
