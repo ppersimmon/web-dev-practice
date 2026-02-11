@@ -1,4 +1,6 @@
 import React, { useState, useRef } from "react";
+import * as Yup from "yup";
+import { Formik, FormikHelpers } from "formik";
 import {
   Dialog,
   DialogTitle,
@@ -8,9 +10,8 @@ import {
   Button,
   IconButton,
   Box,
-  Typography,
   Stack,
-  Avatar,
+  FormHelperText,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
@@ -18,141 +19,181 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from "@mui/icons-material/Send";
 import { postExhibit } from "../api/exhibitActions";
 
+interface FormValues {
+  description: string;
+  image: File | null;
+}
+
 interface NewPostProps {
   open: boolean;
   onClose: () => void;
   onPostCreated: (newPost: any) => void;
 }
 
-const NewPost = ({ open, onClose, onPostCreated }: NewPostProps) => {
-  const [text, setText] = useState("");
-  const [image, setImage] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+const NewPostSchema = Yup.object().shape({
+  description: Yup.string().trim().required("text is required"),
+  image: Yup.mixed().required("image is required"),
+});
 
+const NewPost = ({ open, onClose, onPostCreated }: NewPostProps) => {
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setImage(file);
-      setPreviewUrl(URL.createObjectURL(file));
-    }
-  };
-
-  const handleRemoveImage = () => {
-    setImage(null);
-    setPreviewUrl(null);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
-
-  const handleSubmit = async () => {
-    setLoading(true);
+  const handleSubmit = async (
+    values: FormValues,
+    { setSubmitting, resetForm }: FormikHelpers<FormValues>,
+  ) => {
     try {
       const formData = new FormData();
-      formData.append("description", text);
-      if (image) formData.append("image", image);
-
+      formData.append("description", values.description);
+      if (values.image) {
+        formData.append("image", values.image);
+      }
       const newPost = await postExhibit(formData);
-
       onPostCreated(newPost);
 
-      setText("");
-      handleRemoveImage();
+      resetForm();
+      setPreviewUrl(null);
       onClose();
     } catch (e) {
       console.error(e);
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
-  return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle
-        sx={{
-          m: 0,
-          p: 2,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        Create New Post
-        <IconButton onClick={onClose}>
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
+  const handleClose = (resetForm: () => void) => {
+    resetForm();
+    setPreviewUrl(null);
+    onClose();
+  };
 
-      <DialogContent dividers>
-        <Stack spacing={2}>
-          <TextField
-            autoFocus
-            multiline
-            minRows={3}
-            placeholder="Write a post"
-            variant="standard"
-            fullWidth
-            InputProps={{ disableUnderline: true }}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-          />
-          {previewUrl && (
-            <Box sx={{ position: "relative", mt: 2 }}>
-              <Box
-                component="img"
-                src={previewUrl}
-                sx={{
-                  width: "100%",
-                  maxHeight: 300,
-                  objectFit: "cover",
-                  borderRadius: 2,
+  return (
+    <Formik<FormValues>
+      initialValues={{ description: "", image: null }}
+      validationSchema={NewPostSchema}
+      onSubmit={handleSubmit}
+    >
+      {({
+        values,
+        errors,
+        touched,
+        handleChange,
+        setFieldValue,
+        isSubmitting,
+        submitForm,
+        resetForm,
+      }) => (
+        <Dialog
+          open={open}
+          onClose={() => handleClose(resetForm)}
+          fullWidth
+          maxWidth="sm"
+        >
+          <DialogTitle
+            sx={{
+              m: 0,
+              p: 2,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            Create New Post
+            <IconButton onClick={() => handleClose(resetForm)}>
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+
+          <DialogContent dividers>
+            <Stack spacing={2}>
+              <TextField
+                autoFocus
+                multiline
+                minRows={3}
+                placeholder="Write a post"
+                variant="standard"
+                fullWidth
+                InputProps={{ disableUnderline: true }}
+                name="description"
+                value={values.description}
+                onChange={handleChange}
+                error={touched.description && Boolean(errors.description)}
+                helperText={touched.description && errors.description}
+              />
+              {previewUrl && (
+                <Box sx={{ position: "relative", mt: 2 }}>
+                  <Box
+                    component="img"
+                    src={previewUrl}
+                    sx={{
+                      width: "100%",
+                      maxHeight: 300,
+                      objectFit: "cover",
+                      borderRadius: 2,
+                    }}
+                  />
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      setFieldValue("image", null);
+                      setPreviewUrl(null);
+                      if (fileInputRef.current) fileInputRef.current.value = "";
+                    }}
+                    sx={{
+                      position: "absolute",
+                      top: 8,
+                      right: 8,
+                      bgcolor: "rgba(0,0,0,0.6)",
+                      color: "white",
+                    }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
+              )}
+              {touched.image && errors.image && (
+                <FormHelperText error>{String(errors.image)}</FormHelperText>
+              )}
+            </Stack>
+          </DialogContent>
+
+          <DialogActions sx={{ p: 2, justifyContent: "space-between" }}>
+            <Box>
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                ref={fileInputRef}
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    const file = e.target.files[0];
+                    setFieldValue("image", file);
+                    setPreviewUrl(URL.createObjectURL(file));
+                  }
                 }}
               />
               <IconButton
-                size="small"
-                onClick={handleRemoveImage}
-                sx={{
-                  position: "absolute",
-                  top: 8,
-                  right: 8,
-                  bgcolor: "rgba(0,0,0,0.6)",
-                  color: "white",
-                }}
+                color={
+                  Boolean(errors.image && touched.image) ? "error" : "primary"
+                }
+                onClick={() => fileInputRef.current?.click()}
               >
-                <DeleteIcon />
+                <AddPhotoAlternateIcon />
               </IconButton>
             </Box>
-          )}
-        </Stack>
-      </DialogContent>
-
-      <DialogActions sx={{ p: 2, justifyContent: "space-between" }}>
-        <Box>
-          <input
-            type="file"
-            accept="image/*"
-            hidden
-            ref={fileInputRef}
-            onChange={handleImageChange}
-          />
-          <IconButton
-            color="primary"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <AddPhotoAlternateIcon />
-          </IconButton>
-        </Box>
-        <Button
-          variant="contained"
-          endIcon={<SendIcon />}
-          onClick={handleSubmit}
-          disabled={(!text.trim() && !image) || loading}
-        >
-          {loading ? "Posting..." : "SEND"}
-        </Button>
-      </DialogActions>
-    </Dialog>
+            <Button
+              variant="contained"
+              endIcon={<SendIcon />}
+              onClick={() => submitForm()}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Posting..." : "SEND"}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
+    </Formik>
   );
 };
 

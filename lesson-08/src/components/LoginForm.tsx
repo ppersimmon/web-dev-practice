@@ -1,4 +1,6 @@
 import { useState } from "react";
+import * as Yup from "yup";
+import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import {
   Container,
   Paper,
@@ -15,33 +17,33 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../store/hooks";
 import { loginUserThunk } from "../store/slices/userSlice";
 
+const LoginSchema = Yup.object({
+  username: Yup.string().required().min(3, "username is too short"),
+  password: Yup.string().required(),
+});
+
 const LoginForm = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+  const handleSubmit = async (
+    values: { username: string; password: string },
+    { setSubmitting }: FormikHelpers<{ username: string; password: string }>,
+  ) => {
+    setServerError(null);
 
     try {
-      const resultAction = await dispatch(
-        loginUserThunk({ username, password }),
-      );
-
+      const resultAction = await dispatch(loginUserThunk(values));
       if (loginUserThunk.fulfilled.match(resultAction)) {
         navigate("/");
       } else {
-        setError("Invalid username or password");
+        setServerError("Invalid username or password");
       }
     } catch (err) {
-      setError("Login failed. Please try again.");
+      setServerError("Login failed. Please try again.");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -66,56 +68,66 @@ const LoginForm = () => {
             Sign In
           </Typography>
 
-          {error && (
+          {serverError && (
             <Alert severity="error" sx={{ mt: 2 }}>
-              {error}
+              {serverError}
             </Alert>
           )}
 
-          <Box
-            component="form"
+          <Formik
+            initialValues={{ username: "", password: "" }}
+            validationSchema={LoginSchema}
             onSubmit={handleSubmit}
-            noValidate
-            sx={{ mt: 1 }}
           >
-            <TextField
-              placeholder="Enter username"
-              fullWidth
-              required
-              autoFocus
-              sx={{ mb: 2 }}
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
+            {({ errors, touched, isSubmitting }) => (
+              <Form>
+                <Field
+                  name="username"
+                  as={TextField}
+                  label="Username"
+                  variant="outlined"
+                  fullWidth
+                  margin="normal"
+                  size="small"
+                  error={touched.username && Boolean(errors.username)}
+                  helperText={<ErrorMessage name="username" />}
+                  sx={{ my: 1 }}
+                />
 
-            <TextField
-              placeholder="Enter password"
-              fullWidth
-              required
-              sx={{ mb: 1 }}
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+                <Field
+                  name="password"
+                  type="password"
+                  as={TextField}
+                  label="Password"
+                  variant="outlined"
+                  fullWidth
+                  margin="normal"
+                  size="small"
+                  error={touched.password && Boolean(errors.password)}
+                  helperText={<ErrorMessage name="password" />}
+                  sx={{ m: 0 }}
+                />
 
-            <Button
-              type="submit"
-              variant="contained"
-              fullWidth
-              sx={{ mt: 1, mb: 3 }}
-              disabled={loading}
-            >
-              {loading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                "Sign In"
-              )}
-            </Button>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  fullWidth
+                  sx={{ mt: 1, mb: 3 }}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <CircularProgress size={24} color="inherit" />
+                  ) : (
+                    "Sign In"
+                  )}
+                </Button>
 
-            <Typography component="p">
-              Don't have an account? <Link to={"/sign-up"}>Sign Up</Link>
-            </Typography>
-          </Box>
+                <Typography component="p">
+                  Don't have an account? <Link to={"/sign-up"}>Sign Up</Link>
+                </Typography>
+              </Form>
+            )}
+          </Formik>
         </Paper>
       </Box>
     </Container>
